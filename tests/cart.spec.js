@@ -5,12 +5,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const { test } = require('../utilities/fixtures');
-const { CREDENTIALS, PRODUCTS } = require('../utilities/constants');
+const { credentials, products } = require('../utilities/test-data.json');
 
 // ── Shared setup: log in before every test ──────────────────────────────────
 test.beforeEach(async ({ loginPage, inventoryPage }) => {
   await loginPage.goto();
-  await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+  await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
   await inventoryPage.expectPageLoaded();
 });
 
@@ -21,26 +21,26 @@ test.beforeEach(async ({ loginPage, inventoryPage }) => {
 test.describe('Add to Cart', () => {
 
   test('should add a single item and show cart badge', async ({ inventoryPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.expectCartBadgeShows(1);
   });
 
   test('should add multiple items and badge reflects count', async ({ inventoryPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
-    await inventoryPage.addToCart(PRODUCTS.bikeLight);
+    await inventoryPage.addToCart(products.backpack);
+    await inventoryPage.addToCart(products.bikeLight);
 
     await inventoryPage.expectCartBadgeShows(2);
   });
 
   test('should show items in the cart page after adding from inventory', async ({ inventoryPage, cartPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
-    await inventoryPage.addToCart(PRODUCTS.fleeceJacket);
+    await inventoryPage.addToCart(products.backpack);
+    await inventoryPage.addToCart(products.fleeceJacket);
     await inventoryPage.openCart();
 
     await cartPage.expectPageLoaded();
     await cartPage.expectItemCount(2);
-    await cartPage.expectProductInCart(PRODUCTS.backpack);
-    await cartPage.expectProductInCart(PRODUCTS.fleeceJacket);
+    await cartPage.expectProductInCart(products.backpack);
+    await cartPage.expectProductInCart(products.fleeceJacket);
   });
 });
 
@@ -51,22 +51,22 @@ test.describe('Add to Cart', () => {
 test.describe('Remove from Cart', () => {
 
   test('should remove an item from the cart page', async ({ inventoryPage, cartPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
-    await inventoryPage.addToCart(PRODUCTS.bikeLight);
+    await inventoryPage.addToCart(products.backpack);
+    await inventoryPage.addToCart(products.bikeLight);
     await inventoryPage.openCart();
 
-    await cartPage.removeProduct(PRODUCTS.backpack);
+    await cartPage.removeProduct(products.backpack);
 
     await cartPage.expectItemCount(1);
-    await cartPage.expectProductNotInCart(PRODUCTS.backpack);
-    await cartPage.expectProductInCart(PRODUCTS.bikeLight);
+    await cartPage.expectProductNotInCart(products.backpack);
+    await cartPage.expectProductInCart(products.bikeLight);
   });
 
   test('should remove item from inventory page after adding', async ({ inventoryPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.expectCartBadgeShows(1);
 
-    await inventoryPage.removeFromCartOnInventory(PRODUCTS.backpack);
+    await inventoryPage.removeFromCartOnInventory(products.backpack);
 
     // Badge disappears entirely when cart is empty.
     await inventoryPage.expectCartBadgeHidden();
@@ -80,7 +80,7 @@ test.describe('Remove from Cart', () => {
 test.describe('Cart Navigation', () => {
 
   test('should navigate from cart back to inventory via Continue Shopping', async ({ inventoryPage, cartPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
     await cartPage.expectPageLoaded();
 
@@ -89,7 +89,7 @@ test.describe('Cart Navigation', () => {
   });
 
   test('should navigate to cart and see checkout button', async ({ inventoryPage, cartPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
 
     await cartPage.expectPageLoaded();
@@ -104,20 +104,20 @@ test.describe('Cart Navigation', () => {
 test.describe('Product Detail Page', () => {
 
   test('should open product detail, add to cart, and verify in cart', async ({ inventoryPage, productDetailPage, cartPage }) => {
-    await inventoryPage.openProductDetail(PRODUCTS.fleeceJacket);
+    await inventoryPage.openProductDetail(products.fleeceJacket);
 
-    await productDetailPage.expectProductNameIs(PRODUCTS.fleeceJacket);
+    await productDetailPage.expectProductNameIs(products.fleeceJacket);
     await productDetailPage.expectPriceVisible();
     await productDetailPage.addToCart();
     await productDetailPage.expectRemoveButtonVisible();
 
     await productDetailPage.openCart();
-    await cartPage.expectProductInCart(PRODUCTS.fleeceJacket);
+    await cartPage.expectProductInCart(products.fleeceJacket);
   });
 
   test('should go back to products from detail page', async ({ inventoryPage, productDetailPage }) => {
-    await inventoryPage.openProductDetail(PRODUCTS.backpack);
-    await productDetailPage.expectProductNameIs(PRODUCTS.backpack);
+    await inventoryPage.openProductDetail(products.backpack);
+    await productDetailPage.expectProductNameIs(products.backpack);
 
     await productDetailPage.goBackToProducts();
     await inventoryPage.expectPageLoaded();

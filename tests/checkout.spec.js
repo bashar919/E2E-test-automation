@@ -6,12 +6,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const { test, expect } = require('../utilities/fixtures');
-const { CREDENTIALS, PRODUCTS, CHECKOUT_INFO, ERROR_MESSAGES } = require('../utilities/constants');
+const { credentials, products, checkoutInfo, errorMessages } = require('../utilities/test-data.json');
 
 // ── Shared setup: log in and add items to cart ──────────────────────────────
 test.beforeEach(async ({ loginPage, inventoryPage }) => {
   await loginPage.goto();
-  await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+  await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
   await inventoryPage.expectPageLoaded();
 });
 
@@ -22,7 +22,7 @@ test.beforeEach(async ({ loginPage, inventoryPage }) => {
 test.describe('Full Checkout Flow', () => {
 
   test('should complete checkout with a single item', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
 
     await cartPage.expectPageLoaded();
@@ -32,9 +32,9 @@ test.describe('Full Checkout Flow', () => {
     // Step 1: Your Information
     await checkoutPage.expectStepOneLoaded();
     await checkoutPage.submitInformation(
-      CHECKOUT_INFO.firstName,
-      CHECKOUT_INFO.lastName,
-      CHECKOUT_INFO.postalCode,
+      checkoutInfo.firstName,
+      checkoutInfo.lastName,
+      checkoutInfo.postalCode,
     );
 
     // Step 2: Overview
@@ -49,18 +49,18 @@ test.describe('Full Checkout Flow', () => {
   });
 
   test('should complete checkout with multiple items', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
-    await inventoryPage.addToCart(PRODUCTS.bikeLight);
-    await inventoryPage.addToCart(PRODUCTS.fleeceJacket);
+    await inventoryPage.addToCart(products.backpack);
+    await inventoryPage.addToCart(products.bikeLight);
+    await inventoryPage.addToCart(products.fleeceJacket);
     await inventoryPage.openCart();
 
     await cartPage.expectItemCount(3);
     await cartPage.proceedToCheckout();
 
     await checkoutPage.submitInformation(
-      CHECKOUT_INFO.firstName,
-      CHECKOUT_INFO.lastName,
-      CHECKOUT_INFO.postalCode,
+      checkoutInfo.firstName,
+      checkoutInfo.lastName,
+      checkoutInfo.postalCode,
     );
 
     await checkoutPage.expectStepTwoLoaded();
@@ -71,14 +71,14 @@ test.describe('Full Checkout Flow', () => {
   });
 
   test('should return to inventory from the completion page', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.onesie);
+    await inventoryPage.addToCart(products.onesie);
     await inventoryPage.openCart();
     await cartPage.proceedToCheckout();
 
     await checkoutPage.submitInformation(
-      CHECKOUT_INFO.firstName,
-      CHECKOUT_INFO.lastName,
-      CHECKOUT_INFO.postalCode,
+      checkoutInfo.firstName,
+      checkoutInfo.lastName,
+      checkoutInfo.postalCode,
     );
     await checkoutPage.finishCheckout();
     await checkoutPage.expectCheckoutComplete();
@@ -95,40 +95,40 @@ test.describe('Full Checkout Flow', () => {
 test.describe('Checkout Validation', () => {
 
   test('should show error when first name is empty', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
     await cartPage.proceedToCheckout();
 
-    await checkoutPage.fillInformation('', CHECKOUT_INFO.lastName, CHECKOUT_INFO.postalCode);
+    await checkoutPage.fillInformation('', checkoutInfo.lastName, checkoutInfo.postalCode);
     await checkoutPage.continueToOverview();
 
-    await checkoutPage.expectError(ERROR_MESSAGES.firstNameRequired);
+    await checkoutPage.expectError(errorMessages.firstNameRequired);
   });
 
   test('should show error when last name is empty', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
     await cartPage.proceedToCheckout();
 
-    await checkoutPage.fillInformation(CHECKOUT_INFO.firstName, '', CHECKOUT_INFO.postalCode);
+    await checkoutPage.fillInformation(checkoutInfo.firstName, '', checkoutInfo.postalCode);
     await checkoutPage.continueToOverview();
 
-    await checkoutPage.expectError(ERROR_MESSAGES.lastNameRequired);
+    await checkoutPage.expectError(errorMessages.lastNameRequired);
   });
 
   test('should show error when postal code is empty', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
     await cartPage.proceedToCheckout();
 
-    await checkoutPage.fillInformation(CHECKOUT_INFO.firstName, CHECKOUT_INFO.lastName, '');
+    await checkoutPage.fillInformation(checkoutInfo.firstName, checkoutInfo.lastName, '');
     await checkoutPage.continueToOverview();
 
-    await checkoutPage.expectError(ERROR_MESSAGES.postalCodeRequired);
+    await checkoutPage.expectError(errorMessages.postalCodeRequired);
   });
 
   test('should cancel checkout and return to cart', async ({ inventoryPage, cartPage, checkoutPage }) => {
-    await inventoryPage.addToCart(PRODUCTS.backpack);
+    await inventoryPage.addToCart(products.backpack);
     await inventoryPage.openCart();
     await cartPage.proceedToCheckout();
 

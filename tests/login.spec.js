@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const { test, expect } = require('../utilities/fixtures');
-const { CREDENTIALS, INVALID, ERROR_MESSAGES } = require('../utilities/constants');
+const { credentials, invalid, errorMessages } = require('../utilities/test-data.json');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // VALID LOGIN
@@ -15,7 +15,7 @@ test.describe('Valid Login', () => {
 
   test('should log in with standard_user and land on inventory page', async ({ loginPage, inventoryPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
 
     await inventoryPage.expectPageLoaded();
     await inventoryPage.expectProductCardsVisible();
@@ -24,7 +24,7 @@ test.describe('Valid Login', () => {
 
   test('should display 6 product cards after login', async ({ loginPage, inventoryPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
 
     await inventoryPage.expectPageLoaded();
     await inventoryPage.expectProductCount(6);
@@ -32,7 +32,7 @@ test.describe('Valid Login', () => {
 
   test('should show the shopping cart icon on the inventory page', async ({ loginPage, inventoryPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
 
     await inventoryPage.expectPageLoaded();
     await inventoryPage.expectShoppingCartVisible();
@@ -47,39 +47,39 @@ test.describe('Invalid Login', () => {
 
   test('should show error when both username and password are wrong', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login(INVALID.username, INVALID.password);
+    await loginPage.login(invalid.username, invalid.password);
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.credentialsMismatch);
+    await loginPage.expectErrorMessageToContain(errorMessages.credentialsMismatch);
   });
 
   test('should show error when password is incorrect', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, INVALID.password);
+    await loginPage.login(credentials.standardUser.username, invalid.password);
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.credentialsMismatch);
+    await loginPage.expectErrorMessageToContain(errorMessages.credentialsMismatch);
   });
 
   test('should show error when username is incorrect with valid password', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login(INVALID.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(invalid.username, credentials.standardUser.password);
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.credentialsMismatch);
+    await loginPage.expectErrorMessageToContain(errorMessages.credentialsMismatch);
   });
 
   test('should show error for locked-out user', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.lockedOutUser.username, CREDENTIALS.lockedOutUser.password);
+    await loginPage.login(credentials.lockedOutUser.username, credentials.lockedOutUser.password);
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.lockedOut);
+    await loginPage.expectErrorMessageToContain(errorMessages.lockedOut);
   });
 
   test('should remain on the login page after a failed attempt', async ({ page, loginPage }) => {
     await loginPage.goto();
-    await loginPage.login(INVALID.username, INVALID.password);
+    await loginPage.login(invalid.username, invalid.password);
 
     await expect(page).toHaveURL(/saucedemo\.com/);
     await loginPage.expectErrorVisible();
@@ -97,23 +97,23 @@ test.describe('Empty Fields', () => {
     await loginPage.submitEmpty();
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.usernameRequired);
+    await loginPage.expectErrorMessageToContain(errorMessages.usernameRequired);
   });
 
   test('should show error when password is empty', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, '');
+    await loginPage.login(credentials.standardUser.username, '');
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.passwordRequired);
+    await loginPage.expectErrorMessageToContain(errorMessages.passwordRequired);
   });
 
   test('should show error when username is empty', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.loginWithPasswordOnly(CREDENTIALS.standardUser.password);
+    await loginPage.loginWithPasswordOnly(credentials.standardUser.password);
 
     await loginPage.expectErrorVisible();
-    await loginPage.expectErrorMessageToContain(ERROR_MESSAGES.usernameRequired);
+    await loginPage.expectErrorMessageToContain(errorMessages.usernameRequired);
   });
 });
 
@@ -125,7 +125,7 @@ test.describe('Logout', () => {
 
   test('should log out and return to the login page', async ({ loginPage, inventoryPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
     await inventoryPage.expectPageLoaded();
 
     await inventoryPage.logout();
@@ -137,12 +137,12 @@ test.describe('Logout', () => {
 
   test('should allow logging back in after logout', async ({ loginPage, inventoryPage }) => {
     await loginPage.goto();
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
     await inventoryPage.expectPageLoaded();
 
     await inventoryPage.logout();
 
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
     await inventoryPage.expectPageLoaded();
   });
 });
@@ -156,11 +156,11 @@ test.describe('Retry & Edge Cases', () => {
   test('should succeed on second attempt after initial failure', async ({ loginPage, inventoryPage }) => {
     await loginPage.goto();
 
-    await loginPage.login(INVALID.username, INVALID.password);
+    await loginPage.login(invalid.username, invalid.password);
     await loginPage.expectErrorVisible();
 
     await loginPage.clearFields();
-    await loginPage.login(CREDENTIALS.standardUser.username, CREDENTIALS.standardUser.password);
+    await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
     await inventoryPage.expectPageLoaded();
   });
 });
