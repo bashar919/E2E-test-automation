@@ -1,15 +1,17 @@
 {
   "name": "auto_test",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "E2E test suite for Sauce Demo using Playwright and the Page Object Model pattern.",
   "scripts": {
     "test": "npx playwright test",
-    "test:pom": "npx playwright test POM.spec.js",
-    "test:headed": "npx playwright test POM.spec.js --headed",
+    "test:login": "npx playwright test login.spec.js",
+    "test:cart": "npx playwright test cart.spec.js",
+    "test:checkout": "npx playwright test checkout.spec.js",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
     "report": "npx playwright show-report"
   },
-  "keywords": [],
+  "keywords": ["playwright", "e2e", "pom", "saucedemo"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",

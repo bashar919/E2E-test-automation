@@ -44,6 +44,14 @@ class LoginPage {
   }
 
   /**
+   * Fill only the password field and submit (username left blank).
+   */
+  async loginWithPasswordOnly(password) {
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
+  }
+
+  /**
    * Clear both input fields (useful for retry scenarios).
    */
   async clearFields() {
@@ -52,6 +60,12 @@ class LoginPage {
   }
 
   // ── Assertions ──────────────────────────────────────────────
+
+  async expectLoginFormVisible() {
+    await expect(this.usernameInput).toBeVisible();
+    await expect(this.passwordInput).toBeVisible();
+    await expect(this.loginButton).toBeVisible();
+  }
 
   async expectErrorVisible() {
     await expect(this.errorBanner).toBeVisible();
